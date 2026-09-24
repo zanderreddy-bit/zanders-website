@@ -31,4 +31,12 @@ app.get('/api/getName', (req, res) => {
                     res.set('Access-Control-Allow-Origin', '*');
                     res.json({ name: 'Zanders page' });
                 });
+ 
+
+app.get('/api/getImage', (req, res) => {
+                    res.set('Access-Control-Allow-Origin', '*');
+                    res.sendFile('C:\Users\zande\coolthing\IMG_4799.jpg');
+                });
+                
+
                 
