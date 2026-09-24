@@ -27,7 +27,8 @@ server.listen(port,hostname,()=> {
     console.log(`server running at http:// ${hostname}: ${port}`)
 })
 
- app.get('/coolthing/getName', (req, res) => {
+app.get('/api/getName', (req, res) => {
                     res.set('Access-Control-Allow-Origin', '*');
-                    res.json({ name: 'zanders site' });
+                    res.json({ name: 'Zanders page' });
                 });
+                
