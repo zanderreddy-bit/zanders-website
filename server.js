@@ -27,15 +27,15 @@ server.listen(port,hostname,()=> {
     console.log(`server running at http:// ${hostname}: ${port}`)
 })
 
-app.get('/api/getName', (req, res) => {
-                    res.set('Access-Control-Allow-Origin', '*');
-                    res.json({ name: 'Zanders page' });
-                });
+//app.get('/api/getName', (req, res) => {
+                   // res.set('Access-Control-Allow-Origin', '*');
+                   // res.json({ name: 'Zanders page' });
+           //     });
  
 
 //app.get('/api/getImage', (req, res) => {
-                    res.set('Access-Control-Allow-Origin', '*');
-                    res.sendFile(__dirname ,'IMG_4799.jpg');
+           //         res.set('Access-Control-Allow-Origin', '*');
+               //     res.sendFile(__dirname ,'IMG_4799.jpg');
                // });
                 
 
