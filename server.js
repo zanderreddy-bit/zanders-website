@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
             <title>Course Server</title>
         </head>
         <body>
-            <h1>Hello from the other side  !</h1>
+            <h1>Hello from my server!</h1>
             <p>This page is being served by Node.js and Express.</p>
         </body>
         </html>
@@ -22,10 +22,9 @@ app.get("/", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on port ${PORT}`);
 });
-
-server.listen(port,hostname,()=> {
-    console.log(`server running at http:// ${hostname}: ${port}`)
-})
+//server.listen(port,hostname,()=> {
+    //console.log(`server running at http:// ${hostname}: ${port}`)
+//})
 
 //app.get('/api/getName', (req, res) => {
                    // res.set('Access-Control-Allow-Origin', '*');
