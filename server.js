@@ -32,7 +32,7 @@ app.get('/api/getName', (req, res) => {
 
 app.get('/api/getImage', (req, res) => {
                     res.set('Access-Control-Allow-Origin', '*');
-                    res.sendFile(__dirname ,'IMG_4799.jpg');
+                    res.sendFile(__dirname ,'IMG_4799');
                 });
 
                 
