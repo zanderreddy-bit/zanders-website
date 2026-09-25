@@ -22,14 +22,12 @@ app.get("/", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server listening on port ${PORT}`);
 });
-server.listen(port,hostname,()=> {
-    console.log(`server running at http:// ${hostname}: ${port}`)
-})
 
-//app.get('/api/getName', (req, res) => {
-                   // res.set('Access-Control-Allow-Origin', '*');
-                   // res.json({ name: 'Zanders page' });
-           //     });
+
+app.get('/api/getName', (req, res) => {
+                    res.set('Access-Control-Allow-Origin', '*');
+                    res.json({ name: 'Zanders page' });
+                });
  
 
 //app.get('/api/getImage', (req, res) => {
