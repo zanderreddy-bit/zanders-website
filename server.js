@@ -67,7 +67,9 @@ app.post("/notes", (req, res) => {
     const noteText = req.body.note;
 
     if (typeof noteText !== "string" || !noteText.trim()) {
-        return res.status(400).send("Please enter a note.");
+        return res.status(400).json({
+            error: "Please enter a note."
+        });
     }
 
     const note = {
@@ -77,19 +79,9 @@ app.post("/notes", (req, res) => {
 
     notes.push(note);
 
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head><meta charset="UTF-8"><title>Note Saved</title></head>
-        <body>
-            <h1>Note saved!</h1>
-            <p>${escapeHtml(note.text)}</p>
-            <p><a href="/">Return home</a></p>
-        </body>
-        </html>
-    `);
+    // Send JSON back to the AJAX request
+    res.status(201).json(note);
 });
-
 // AJAX endpoint: return notes as JSON
 app.get("/api/notes", (req, res) => {
     res.json(notes);

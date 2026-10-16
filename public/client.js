@@ -21,10 +21,10 @@ async function loadNotes() {
 
             // Handle notes stored as strings or objects
             if (typeof note === "string") {
-                item.textContent = note;
-            } else {
-                item.textContent = note.note;
-            }
+    item.textContent = note;
+} else {
+    item.textContent = note.text;
+}
 
             notesList.appendChild(item);
         });
