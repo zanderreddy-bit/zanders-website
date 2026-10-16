@@ -3,71 +3,56 @@ const noteInput = document.getElementById("noteInput");
 const notesList = document.getElementById("notesList");
 const noteStatus = document.getElementById("noteStatus");
 
-// Load existing notes from the server
-async function loadNotes() {
-    try {
-        const response = await fetch("/api/notes");
+// Load notes from the server
+function loadNotes() {
+    fetch("/api/notes")
+        .then(response => response.json())
+        .then(notes => {
+            notesList.innerHTML = "";
 
-        if (!response.ok) {
-            throw new Error("Could not load notes");
-        }
-
-        const notes = await response.json();
-
-        notesList.replaceChildren();
-
-        notes.forEach(function(note) {
-            const item = document.createElement("li");
-
-            // Handle notes stored as strings or objects
-            if (typeof note === "string") {
-    item.textContent = note;
-} else {
-    item.textContent = note.text;
-}
-
-            notesList.appendChild(item);
+            notes.forEach(note => {
+                const item = document.createElement("li");
+                item.textContent = note.text;
+                notesList.appendChild(item);
+            });
+        })
+        .catch(error => {
+            noteStatus.textContent = "Could not load notes.";
+            console.log(error);
         });
-    } catch (error) {
-        noteStatus.textContent = "Could not load notes.";
-        console.error(error);
-    }
 }
 
-// Save a note without refreshing the page
-noteForm.addEventListener("submit", async function(event) {
+// Save a new note
+noteForm.addEventListener("submit", function(event) {
     event.preventDefault();
 
     const note = noteInput.value.trim();
 
-    if (!note) {
+    if (note === "") {
         return;
     }
 
-    noteStatus.textContent = "Saving...";
+    fetch("/notes", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({ note: note })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Could not save note");
+            }
 
-    try {
-        const response = await fetch("/notes", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
-            },
-            body: new URLSearchParams({ note: note })
+            noteInput.value = "";
+            noteStatus.textContent = "Note saved!";
+            loadNotes();
+        })
+        .catch(error => {
+            noteStatus.textContent = "Could not save note.";
+            console.log(error);
         });
-
-        if (!response.ok) {
-            throw new Error("Could not save note");
-        }
-
-        noteInput.value = "";
-        noteStatus.textContent = "Note saved!";
-
-        await loadNotes();
-    } catch (error) {
-        noteStatus.textContent = "Could not save the note. Try again.";
-        console.error(error);
-    }
 });
 
-// Display notes when the page opens
+// Load notes when the page opens
 loadNotes();
