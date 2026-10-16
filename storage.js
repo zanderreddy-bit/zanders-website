@@ -4,6 +4,39 @@ const {
     GetObjectCommand
 } = require("@aws-sdk/client-s3");
 
+
+const requiredKeys = [
+    "B2_KEY_ID",
+    "B2_APPLICATION_KEY",
+    "B2_ENDPOINT",
+    "B2_REGION",
+    "B2_BUCKET"
+];
+
+const missingKeys = requiredKeys.filter(
+    key => !process.env[key] || !process.env[key].trim()
+);
+
+console.log(
+    "Backblaze environment check:",
+    missingKeys.length === 0
+        ? "All five variables are present."
+        : `Missing or empty: ${missingKeys.join(", ")}`
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const path = require("path");
 const { randomUUID } = require("crypto");
