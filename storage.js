@@ -25,18 +25,6 @@ console.log(
 );
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const path = require("path");
 const { randomUUID } = require("crypto");
