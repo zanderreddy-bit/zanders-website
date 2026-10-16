@@ -46,6 +46,30 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(publicDir, "index.html"));
 });
 
+// API: Return website name for the class website
+app.get("/api/getName", (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.json({ name: "Bunner" });
+});
+
+// API: Return an image for the class website
+app.get("/api/getImage", (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+
+    res.sendFile(
+        path.join(publicDir, "images", "notes.jpg"),
+        (err) => {
+            if (err) {
+                console.error("Could not send image:", err);
+
+                if (!res.headersSent) {
+                    res.status(404).send("Image not found.");
+                }
+            }
+        }
+    );
+});
+
 // Route parameter example: /hello/Alex
 app.get("/hello/:name", (req, res) => {
     res.send(`Hello, ${escapeHtml(req.params.name)}!`);
@@ -82,7 +106,8 @@ app.post("/notes", (req, res) => {
     // Send JSON back to the AJAX request
     res.status(201).json(note);
 });
-// AJAX endpoint: return notes as JSON
+
+// AJAX endpoint: Return notes as JSON
 app.get("/api/notes", (req, res) => {
     res.json(notes);
 });
@@ -99,14 +124,19 @@ app.post("/upload", upload.single("myFile"), async (req, res, next) => {
         res.send(`
             <!DOCTYPE html>
             <html lang="en">
-            <head><meta charset="UTF-8"><title>Upload Complete</title></head>
+            <head>
+                <meta charset="UTF-8">
+                <title>Upload Complete</title>
+            </head>
             <body>
                 <h1>Upload successful!</h1>
                 <p>File: ${escapeHtml(req.file.originalname)}</p>
                 <p>Your file is stored in Backblaze B2.</p>
-                <p><a href="/file-download?key=${encodeURIComponent(key)}">
-                    Download your file
-                </a></p>
+                <p>
+                    <a href="/file-download?key=${encodeURIComponent(key)}">
+                        Download your file
+                    </a>
+                </p>
                 <p><a href="/">Return home</a></p>
             </body>
             </html>
