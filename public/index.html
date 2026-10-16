@@ -187,22 +187,28 @@
             </div>
 
             <div class="card" id="notes">
-                <div class="image-box">
-                    <img src="images/notes.jpg"
-                         alt="Notes"
-                         onerror="this.style.display='none'; this.parentElement.textContent='Add a notes image here';">
-                </div>
+    <div class="image-box">
+        <img src="images/notes.jpg"
+             alt="Notes"
+             onerror="this.style.display='none'; this.parentElement.textContent='Add a notes image here';">
+    </div>
 
-                <h2>praise the fatman</h2>
-                <p>Tell me how good my bunny looks</p>
+    <h2>praise the fatman</h2>
+    <p>Tell me how good my bunny looks</p>
 
-                <form action="/notes" method="POST">
-                    <textarea name="note"
-                              placeholder="Write your note here..."
-                              required></textarea>
-                    <button type="submit">Save Note</button>
-                </form>
-            </div>
+    <form id="noteForm">
+        <textarea id="noteInput"
+                  name="note"
+                  placeholder="Write your note here..."
+                  required></textarea>
+        <button type="submit">Save Note</button>
+    </form>
+
+    <p id="noteStatus"></p>
+
+    <h3>Messages about the bunny</h3>
+    <ul id="notesList"></ul>
+</div>
 
             <div class="card" id="tools">
                 <div class="image-box">
@@ -228,7 +234,7 @@
         <p>bunner</p>
     </footer>
 
-</body>
+<script src="/client.js"></script> </body>
 </html>
 
 

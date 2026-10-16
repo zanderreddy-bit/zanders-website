@@ -1,30 +1,61 @@
-loadNotesButton.addEventListener("click", async () => {
-    notesStatus.textContent = "Loading notes...";
-    notesList.replaceChildren();
 
+const noteForm = document.getElementById("noteForm");
+const noteInput = document.getElementById("noteInput");
+const notesList = document.getElementById("notesList");
+const noteStatus = document.getElementById("noteStatus");
+
+// Load existing notes from the server
+async function loadNotes() {
     try {
         const response = await fetch("/api/notes");
 
         if (!response.ok) {
-            throw new Error("Could not load notes.");
+            throw new Error("Could not load notes");
         }
 
         const notes = await response.json();
 
-        if (notes.length === 0) {
-            notesStatus.textContent = "No notes have been saved yet.";
-            return;
-        }
+        notesList.replaceChildren();
 
-        notesStatus.textContent = "";
-
-        notes.forEach(note => {
+        notes.forEach(function(note) {
             const item = document.createElement("li");
-            item.textContent = note.text;
+            item.textContent = note;
             notesList.appendChild(item);
         });
     } catch (error) {
-        notesStatus.textContent = "Error loading notes. Please try again.";
-        console.error(error);
+        noteStatus.textContent = "Could not load notes.";
+    }
+}
+
+// Save a note without refreshing the page
+noteForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const note = noteInput.value.trim();
+
+    if (!note) {
+        return;
+    }
+
+    noteStatus.textContent = "Saving...";
+
+    try {
+        const response = await fetch("/notes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({ note: note })
+        });
+
+        if (!response.ok) {
+            throw new Error("Could not save note");
+        }
+
+        noteInput.value = "";
+        noteStatus.textContent = "Note saved!";
+        await loadNotes();
+    } catch (error) {
+        noteStatus.textContent = "Could not save the note. Try again.";
     }
 });
