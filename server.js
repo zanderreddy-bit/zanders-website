@@ -158,7 +158,7 @@ app.post("/upload", upload.single("myFile"), async (req, res, next) => {
     }
 });
 
-// Generate a temporary signed URL and redirect to Backblaze
+// Generate a temporary 10 min
 app.get("/file-download", async (req, res, next) => {
     try {
         const key = req.query.key;
@@ -192,6 +192,7 @@ app.use((req, res) => {
 });
 
 // Custom error handler last one 
+// Custom error handler last one
 app.use((err, req, res, next) => {
     console.error(err);
 
@@ -199,17 +200,25 @@ app.use((err, req, res, next) => {
         return next(err);
     }
 
+    // Handle Multer errors, including files that are too large
     if (err instanceof multer.MulterError) {
         return res.status(400).send(
-            "Upload failed. The file must be no larger than 5 MB."
+            "400 - Bad Request. Upload failed. The file must be no larger than 5 MB."
         );
     }
 
+    // Handle other errors marked as 400
+    if (err.status === 400 || err.statusCode === 400) {
+        return res.status(400).send(
+            "400 - Bad Request. Check your request and try again."
+        );
+    }
+
+    // Handle all other server errors
     res.status(500).send(
         "500 - Server Error. Check the server logs."
     );
 });
-
 // ports 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
