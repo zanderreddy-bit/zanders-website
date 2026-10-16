@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,23 +12,34 @@
     <h2>Submit a note</h2>
     <form action="/notes" method="POST">
         <label for="note">Your note:</label>
-        <input type="text" id="note" name="note" required>
+        <input
+            type="text"
+            id="note"
+            name="note"
+            maxlength="1000"
+            required
+        >
         <button type="submit">Save note</button>
     </form>
 
-    <h2>Upload a file</h2>
-    
-<form action="/upload" method="POST" enctype="multipart/form-data">
-    <label for="myFile">Choose a file:</label>
-    <input type="file" id="myFile" name="myFile" required>
-    <button type="submit">Upload to Backblaze</button>
-</form>
+    <h2>Upload a file to Backblaze</h2>
+    <p>Maximum file size: 5 MB.</p>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <label for="myFile">Choose a file:</label>
+        <input type="file" id="myFile" name="myFile" required>
+        <button type="submit">Upload file</button>
+    </form>
 
     <h2>Download a file</h2>
-    <a href="/download">Download example text file</a>
+    <p>
+        After uploading a file, use the download link on the
+        upload-success page.
+    </p>
 
     <h2>AJAX: Load notes without reloading</h2>
-    <button id="loadNotes">Load notes</button>
+    <button id="loadNotes" type="button">Load notes</button>
+    <p id="notesStatus" aria-live="polite"></p>
     <ul id="notesList"></ul>
 
     <h2>Test routes</h2>

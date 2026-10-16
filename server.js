@@ -1,29 +1,36 @@
 
-
 require("dotenv").config();
+
+const express = require("express");
+const multer = require("multer");
+const path = require("path");
 
 const {
     uploadFile,
     createDownloadUrl
 } = require("./storage");
 
-// Read normal form submissions and JSON
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Read form submissions and JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Serve files from public/
+// Serve static files from public/
 const publicDir = path.join(__dirname, "public");
 app.use(express.static(publicDir));
 
-// Multer keeps the file in memory for Backblaze
+// Store uploaded files in memory before sending to Backblaze
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// Example notes (reset when the server restarts)
+// Example notes (cleared when server restarts)
 const notes = [];
 
+// Escape user input before placing it into HTML
 function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, char => ({
         "&": "&amp;",
@@ -39,12 +46,12 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(publicDir, "index.html"));
 });
 
-// Route parameter: /hello/Alex
+// Route parameter example: /hello/Alex
 app.get("/hello/:name", (req, res) => {
     res.send(`Hello, ${escapeHtml(req.params.name)}!`);
 });
 
-// Query parameter: /search?term=hello
+// Query parameter example: /search?term=hello
 app.get("/search", (req, res) => {
     const term = req.query.term || "";
 
@@ -55,7 +62,7 @@ app.get("/search", (req, res) => {
     res.send(`You searched for: ${escapeHtml(term)}`);
 });
 
-// HTML form submission
+// Save a note from an HTML form
 app.post("/notes", (req, res) => {
     const noteText = req.body.note;
 
@@ -71,42 +78,53 @@ app.post("/notes", (req, res) => {
     notes.push(note);
 
     res.send(`
-        <h1>Note saved!</h1>
-        <p>${escapeHtml(note.text)}</p>
-        <a href="/">Go back</a>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head><meta charset="UTF-8"><title>Note Saved</title></head>
+        <body>
+            <h1>Note saved!</h1>
+            <p>${escapeHtml(note.text)}</p>
+            <p><a href="/">Return home</a></p>
+        </body>
+        </html>
     `);
 });
 
-// AJAX endpoint
+// AJAX endpoint: return notes as JSON
 app.get("/api/notes", (req, res) => {
     res.json(notes);
 });
 
-// Upload directly to Backblaze B2
+// Upload a file to Backblaze B2
 app.post("/upload", upload.single("myFile"), async (req, res, next) => {
     try {
         if (!req.file) {
             return res.status(400).send("Please select a file.");
         }
 
-        // Pass the Multer buffer to storage.js
         const key = await uploadFile(req.file);
 
         res.send(`
-            <h1>Upload successful!</h1>
-            <p>File: ${escapeHtml(req.file.originalname)}</p>
-            <p>Your file is stored in Backblaze B2.</p>
-            <a href="/file-download?key=${encodeURIComponent(key)}">
-                Download your file
-            </a>
-            <p><a href="/">Return home</a></p>
+            <!DOCTYPE html>
+            <html lang="en">
+            <head><meta charset="UTF-8"><title>Upload Complete</title></head>
+            <body>
+                <h1>Upload successful!</h1>
+                <p>File: ${escapeHtml(req.file.originalname)}</p>
+                <p>Your file is stored in Backblaze B2.</p>
+                <p><a href="/file-download?key=${encodeURIComponent(key)}">
+                    Download your file
+                </a></p>
+                <p><a href="/">Return home</a></p>
+            </body>
+            </html>
         `);
     } catch (err) {
         next(err);
     }
 });
 
-// Redirect the browser to Backblaze
+// Generate a temporary signed URL and redirect to Backblaze
 app.get("/file-download", async (req, res, next) => {
     try {
         const key = req.query.key;
@@ -120,28 +138,26 @@ app.get("/file-download", async (req, res, next) => {
         }
 
         const url = await createDownloadUrl(key);
-
-        // Backblaze serves the file, not Render
         res.redirect(url);
     } catch (err) {
         next(err);
     }
 });
 
-// Test the 500 handler
+// Test the custom 500 handler
 app.get("/test-error", (req, res, next) => {
     next(new Error("Test server error."));
 });
 
-// Custom 404 handler
+// Custom 404 handler (must be after all normal routes)
 app.use((req, res) => {
     res.status(404).send(`
         <h1>404 - Page Not Found</h1>
-        <a href="/">Return home</a>
+        <p><a href="/">Return home</a></p>
     `);
 });
 
-// Custom 500 handler
+// Custom error handler (must be last)
 app.use((err, req, res, next) => {
     console.error(err);
 
@@ -151,7 +167,7 @@ app.use((err, req, res, next) => {
 
     if (err instanceof multer.MulterError) {
         return res.status(400).send(
-            "Upload failed. Check that the file is no larger than 5 MB."
+            "Upload failed. The file must be no larger than 5 MB."
         );
     }
 
@@ -160,7 +176,7 @@ app.use((err, req, res, next) => {
     );
 });
 
-// Render needs the assigned port and an external interface
+// Render supplies PORT; listen on all network interfaces
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
 });
