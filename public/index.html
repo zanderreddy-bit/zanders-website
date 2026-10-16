@@ -16,11 +16,12 @@
     </form>
 
     <h2>Upload a file</h2>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-        <label for="myFile">Choose a file:</label>
-        <input type="file" id="myFile" name="myFile" required>
-        <button type="submit">Upload</button>
-    </form>
+    
+<form action="/upload" method="POST" enctype="multipart/form-data">
+    <label for="myFile">Choose a file:</label>
+    <input type="file" id="myFile" name="myFile" required>
+    <button type="submit">Upload to Backblaze</button>
+</form>
 
     <h2>Download a file</h2>
     <a href="/download">Download example text file</a>
