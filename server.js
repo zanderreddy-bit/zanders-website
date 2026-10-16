@@ -178,12 +178,12 @@ app.get("/file-download", async (req, res, next) => {
     }
 });
 
-// Test the custom 500 handler
+// Test  500 handler
 app.get("/test-error", (req, res, next) => {
     next(new Error("Test server error."));
 });
 
-// Custom 404 handler 
+// test  404 handler 
 app.use((req, res) => {
     res.status(404).send(`
         <h1>404 - Page Not Found</h1>
@@ -191,8 +191,25 @@ app.use((req, res) => {
     `);
 });
 
-// Custom error handler last one 
-// Custom error handler last one
+ //  404 handler
+app.use((req, res) => {
+    res.status(404).send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>404 - Page Not Found</title>
+        </head>
+        <body>
+            <h1>404 - Page Not Found</h1>
+            <p>The page you are looking for does not exist.</p>
+            <p><a href="/">Return home</a></p>
+        </body>
+        </html>
+    `);
+});
+
+// Custom error handler - must be last
 app.use((err, req, res, next) => {
     console.error(err);
 
@@ -200,21 +217,21 @@ app.use((err, req, res, next) => {
         return next(err);
     }
 
-    // Handle Multer errors, including files that are too large
+    //  upload errors
     if (err instanceof multer.MulterError) {
         return res.status(400).send(
             "400 - Bad Request. Upload failed. The file must be no larger than 5 MB."
         );
     }
 
-    // Handle other errors marked as 400
+    //  other bad requests
     if (err.status === 400 || err.statusCode === 400) {
         return res.status(400).send(
             "400 - Bad Request. Check your request and try again."
         );
     }
 
-    // Handle all other server errors
+    //  unexpected server errors
     res.status(500).send(
         "500 - Server Error. Check the server logs."
     );
