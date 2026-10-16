@@ -1,4 +1,4 @@
-onst noteForm = document.getElementById("noteForm");
+const noteForm = document.getElementById("noteForm");
 const noteInput = document.getElementById("noteInput");
 const notesList = document.getElementById("notesList");
 const noteStatus = document.getElementById("noteStatus");
