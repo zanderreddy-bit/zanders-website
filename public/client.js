@@ -18,15 +18,14 @@ async function loadNotes() {
         notesList.replaceChildren();
 
         notes.forEach(function(note) {
-            const item = document.createElement("li");
-            item.textContent = note;
-            notesList.appendChild(item);
-        });
-    } catch (error) {
-        noteStatus.textContent = "Could not load notes.";
-    }
-}
+    const item = document.createElement("li");
 
+    item.textContent = typeof note === "string"
+        ? note
+        : note.note;
+
+    notesList.appendChild(item);
+});
 // Save a note without refreshing the page
 noteForm.addEventListener("submit", async function(event) {
     event.preventDefault();
