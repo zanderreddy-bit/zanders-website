@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const { randomUUID } = require("crypto");
 
 const {
     uploadFile,
@@ -13,7 +14,7 @@ const {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Read form submissions and JSON
+// Read form submissions and JSON files 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -21,16 +22,16 @@ app.use(express.json());
 const publicDir = path.join(__dirname, "public");
 app.use(express.static(publicDir));
 
-// Store uploaded files in memory before sending to Backblaze
+// Stores uploaded files in memory before sending to Backblaze
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 }
 });
 
-// Example notes (cleared when server restarts)
+//  notes 
 const notes = [];
 
-// Escape user input before placing it into HTML
+// wscape user input before placing it into HTML zander dont move has to be above most stuff
 function escapeHtml(value) {
     return String(value).replace(/[&<>"']/g, char => ({
         "&": "&amp;",
@@ -46,13 +47,13 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(publicDir, "index.html"));
 });
 
-// API: Return website name for the class website
+// api name
 app.get("/api/getName", (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
     res.json({ name: "Bunner" });
 });
 
-// API: Return an image for the class website
+// api bunny imge
 app.get("/api/getImage", (req, res) => {
     res.set("Access-Control-Allow-Origin", "*");
 
@@ -70,12 +71,12 @@ app.get("/api/getImage", (req, res) => {
     );
 });
 
-// Route parameter example: /hello/Alex
+// Routes parameter  aka hello and alex
 app.get("/hello/:name", (req, res) => {
     res.send(`Hello, ${escapeHtml(req.params.name)}!`);
 });
 
-// Query parameter example: /search?term=hello
+// Query parameter does the search?term=hello
 app.get("/search", (req, res) => {
     const term = req.query.term || "";
 
@@ -86,7 +87,7 @@ app.get("/search", (req, res) => {
     res.send(`You searched for: ${escapeHtml(term)}`);
 });
 
-// Save a note from an HTML form
+// save  notes from an HTML form
 app.post("/notes", (req, res) => {
     const noteText = req.body.note;
 
@@ -103,7 +104,7 @@ app.post("/notes", (req, res) => {
 
     notes.push(note);
 
-    // Send JSON back to the AJAX request
+    // Send JSON back to the AJAX \
     res.status(201).json(note);
 });
 
@@ -119,7 +120,18 @@ app.post("/upload", upload.single("myFile"), async (req, res, next) => {
             return res.status(400).send("Please select a file.");
         }
 
-        const key = await uploadFile(req.file);
+        // Create a safe, unique filename
+        const originalName = path.basename(req.file.originalname)
+            .replace(/[^a-zA-Z0-9._-]/g, "_");
+
+        const key = `uploads/${randomUUID()}-${originalName}`;
+
+        // Upload using the key, file buffer, and content type
+        await uploadFile(
+            key,
+            req.file.buffer,
+            req.file.mimetype
+        );
 
         res.send(`
             <!DOCTYPE html>
@@ -171,7 +183,7 @@ app.get("/test-error", (req, res, next) => {
     next(new Error("Test server error."));
 });
 
-// Custom 404 handler (must be after all normal routes)
+// Custom 404 handler 
 app.use((req, res) => {
     res.status(404).send(`
         <h1>404 - Page Not Found</h1>
@@ -179,7 +191,7 @@ app.use((req, res) => {
     `);
 });
 
-// Custom error handler (must be last)
+// Custom error handler last one 
 app.use((err, req, res, next) => {
     console.error(err);
 
@@ -198,7 +210,7 @@ app.use((err, req, res, next) => {
     );
 });
 
-// Render supplies PORT; listen on all network interfaces
+// ports 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
 });
